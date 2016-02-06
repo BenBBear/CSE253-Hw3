@@ -1,21 +1,6 @@
-name: "CIFAR100_19layers"
-layer {
-  name: "cifar"
-  type: "Data"
-  top: "data"
-  top: "label"
-  data_param {
-    source: "data/cifar100/cifar100_full_train_leveldb_padded"
-    batch_size: 100
-    backend: LEVELDB
-  }
-  transform_param {
-    mean_file: "data/cifar100/paddedmean.binaryproto"
-    mirror: 1
-    crop_size: 32
-  }
-  include: { phase: TRAIN }
-}
+name: "Question 3"
+
+## Data Layer for train/test
 layer {
   name: "cifar"
   type: "Data"
@@ -28,13 +13,10 @@ layer {
   }
   transform_param {
     mean_file: "data/cifar100/mean.binaryproto"
-    mirror: 0
   }
-  include: {
-    phase: TEST
-    stage: 'test-on-train'
-  }
+  include: { phase: TRAIN }
 }
+
 layer {
   name: "cifar"
   type: "Data"
@@ -47,14 +29,15 @@ layer {
   }
   transform_param {
     mean_file: "data/cifar100/mean.binaryproto"
-    mirror: 0
   }
   include: {
     phase: TEST
-    stage: 'test-on-test'
   }
 }
 
+
+
+## First Convolution Layer
 layer {
   name: "conv1"
   type: "Convolution"
@@ -68,8 +51,8 @@ layer {
   }
   convolution_param {
     num_output: 32
-    pad: 2
-    kernel_size: 5
+    pad: 1
+    kernel_size: 3
     stride: 1
     weight_filler {
       type: "gaussian"
@@ -80,23 +63,27 @@ layer {
     }
   }
 }
-layer {
-  name: "pool1"
-  type: "Pooling"
-  bottom: "conv1"
-  top: "pool1"
-  pooling_param {
-    pool: MAX
-    kernel_size: 3
-    stride: 2
-  }
-}
+# layer {
+#   name: "pool1"
+#   type: "Pooling"
+#   bottom: "conv1"
+#   top: "pool1"
+#   pooling_param {
+#     pool: MAX
+#     kernel_size: 3
+#     stride: 2
+#   }
+# }
 layer {
   name: "relu1"
   type: "ReLU"
-  bottom: "pool1"
+  bottom: "conv1"
   top: "pool1"
 }
+
+
+
+## Second Convolution Layer
 layer {
   name: "conv2"
   type: "Convolution"
@@ -110,8 +97,8 @@ layer {
   }
   convolution_param {
     num_output: 32
-    pad: 2
-    kernel_size: 5
+    pad: 1
+    kernel_size: 3
     stride: 1
     weight_filler {
       type: "gaussian"
@@ -139,6 +126,10 @@ layer {
     stride: 2
   }
 }
+
+
+
+## The third Convolution Layer
 layer {
   name: "conv3"
   type: "Convolution"
@@ -181,11 +172,14 @@ layer {
     stride: 2
   }
 }
+
+
+## First Fully Connected Layer
 layer {
-  name: "ip1"
+  name: "fc1"
   type: "InnerProduct"
   bottom: "pool3"
-  top: "ip1"
+  top: "fc1"
   param {
     lr_mult: 1
   }
@@ -203,11 +197,13 @@ layer {
     }
   }
 }
+
+## Second Fully Connected Layer
 layer {
-  name: "ip2"
+  name: "fc2"
   type: "InnerProduct"
-  bottom: "ip1"
-  top: "ip2"
+  bottom: "fc1"
+  top: "fc2"
   param {
     lr_mult: 1
   }
@@ -225,10 +221,11 @@ layer {
     }
   }
 }
+
 layer {
   name: "accuracy"
   type: "Accuracy"
-  bottom: "ip2"
+  bottom: "fc2"
   bottom: "label"
   top: "accuracy"
   include {
@@ -238,7 +235,7 @@ layer {
 layer {
   name: "loss"
   type: "SoftmaxWithLoss"
-  bottom: "ip2"
+  bottom: "fc2"
   bottom: "label"
   top: "loss"
 }
