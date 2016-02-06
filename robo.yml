@@ -7,6 +7,9 @@ q3:
   exec: caffe train --solver=./q3/solver.prototxt
 
 
+
+
+
 getCifar100:
   summary: Get Cifar 100 data
   exec: ./scripts/get_cifar100.sh
