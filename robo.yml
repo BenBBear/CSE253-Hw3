@@ -14,6 +14,21 @@ getCifar100:
   summary: Get Cifar 100 data
   exec: ./scripts/get_cifar100.sh
 
+
+processCifar100:
+  summary: Process Cifar100 to lmdb 
+  exec: ./scripts/process.sh
+
+
+processCifar100Normalize:
+  summary: Process Cifar100 data and do global contrast normalization
+  exec: ./scripts/processNormal.sh
+
 fixlibdc:
   summary: Fix libdc could not create lmdb problem.
   exec: ./scripts/fixlibdc.sh
+
+
+chmod:
+  summary: change scripts to executable
+  exec: chmod -R +x ./scripts/

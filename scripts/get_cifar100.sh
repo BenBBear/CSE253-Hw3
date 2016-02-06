@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
-
-wget "https://www.dropbox.com/s/0ydxw5jh0406ib0/cifar100-gcn-leveldb-splits.tar.bz2?dl=0"
-
-mv scripts/cifar100-gcn-leveldb-splits  data/cifar100
+mkdir data
+wget "https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz"
+tar xvf cifar-100-python.tar.gz 
+mv cifar-100-python data/cifar100-raw
+rm cifar-100-python.tar.gz
