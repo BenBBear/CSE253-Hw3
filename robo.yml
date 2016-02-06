@@ -1,3 +1,8 @@
+
+
+snapshotFolder:
+  script: ./scripts/snapshotFolder.sh
+
 cifar10:
   summary: Cifar10 as a example   #The basic CNN as our foundation.
   exec: caffe train --solver=./cifar10/solver.prototxt
