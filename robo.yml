@@ -1,3 +1,13 @@
+cifar10:
+  summary: Cifar10 as a example   #The basic CNN as our foundation.
+  exec: caffe train --solver=./cifar10/solver.prototxt
+
 q3:
   summary: The basic CNN as our foundation.
-  exec: caffe train --solver=./basic/basic_solver.prototxt
+  exec: caffe train --solver=./q3/solver.prototxt
+
+
+
+fixlibdc:
+  summary: Fix libdc could not create lmdb problem.
+  exec: ./scripts/fixlibdc.sh
