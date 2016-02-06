@@ -4,3 +4,14 @@
 - *Errro*: Encounter "input blob unknown Error"
 - *Solve*: Remove unnecessary stage in net.prototxt
 
+
+
+**Sat Feb  6 18:14:17 UTC 2016**
+
+- *Error*: Unable to visualize graph
+- *Solve*: 
+    0. install xvfb, `sudo apt-get install xvfb`
+    1. add `$CAFFE_ROOT/python` to path
+    2. install `sudo apt-get install graphviz`,`pip install pydot`
+    3. ensure no number in net name
+    4. `xvfb-run draw_net.py input.prototxt vis.png`
