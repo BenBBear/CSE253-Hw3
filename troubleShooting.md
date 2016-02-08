@@ -14,5 +14,5 @@
     1. add `$CAFFE_ROOT/python` to path
     2. install `sudo apt-get install graphviz`, pydot
     3. [http://stackoverflow.com/questions/15951748/pydot-and-graphviz-error-couldnt-import-dot-parser-loading-of-dot-files-will]()  this is the pydot install guide
-    3. ensure no number in net name
+    3. ensure no number in net name, and net must have name
     4. `xvfb-run draw_net.py input.prototxt vis.png`

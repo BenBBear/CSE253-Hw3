@@ -1,43 +1,38 @@
-name: "Question"
-
-## Data Layer for train/test
+name: "CIFAR10_quick"
 layer {
   name: "cifar"
   type: "Data"
   top: "data"
   top: "label"
-  data_param {
-    source: "data/cifar100/cifar100_full_train_leveldb"
-    batch_size: 100
-    backend: LEVELDB
+  include {
+    phase: TRAIN
   }
   transform_param {
-    mean_file: "data/cifar100/mean.binaryproto"
+    mean_file: "./data/cifar10/mean.binaryproto"
   }
-  include: { phase: TRAIN }
+  data_param {
+    source: "./data/cifar10/cifar10_train_lmdb"
+    batch_size: 100
+    backend: LMDB
+  }
 }
-
 layer {
   name: "cifar"
   type: "Data"
   top: "data"
   top: "label"
-  data_param {
-    source: "data/cifar100/cifar100_test_leveldb"
-    batch_size: 100
-    backend: LEVELDB
-  }
-  transform_param {
-    mean_file: "data/cifar100/mean.binaryproto"
-  }
-  include: {
+  include {
     phase: TEST
   }
+  transform_param {
+    mean_file: "./data/cifar10/mean.binaryproto"
+  }
+  data_param {
+    source: "./data/cifar10/cifar10_test_lmdb"
+    batch_size: 100
+    backend: LMDB
+  }
 }
-
-
-
-## First Convolution Layer
 layer {
   name: "conv1"
   type: "Convolution"
@@ -50,9 +45,9 @@ layer {
     lr_mult: 2
   }
   convolution_param {
-    num_output: 64
-    pad: 1
-    kernel_size: 3
+    num_output: 32
+    pad: 2
+    kernel_size: 5
     stride: 1
     weight_filler {
       type: "gaussian"
@@ -63,27 +58,23 @@ layer {
     }
   }
 }
-# layer {
-#   name: "pool1"
-#   type: "Pooling"
-#   bottom: "conv1"
-#   top: "pool1"
-#   pooling_param {
-#     pool: MAX
-#     kernel_size: 3
-#     stride: 1
-#   }
-# }
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
 layer {
   name: "relu1"
   type: "ReLU"
-  bottom: "conv1"
+  bottom: "pool1"
   top: "pool1"
 }
-
-
-
-## Second Convolution Layer
 layer {
   name: "conv2"
   type: "Convolution"
@@ -96,9 +87,9 @@ layer {
     lr_mult: 2
   }
   convolution_param {
-    num_output: 42
-    pad: 1
-    kernel_size: 2
+    num_output: 32
+    pad: 2
+    kernel_size: 5
     stride: 1
     weight_filler {
       type: "gaussian"
@@ -121,15 +112,11 @@ layer {
   bottom: "conv2"
   top: "pool2"
   pooling_param {
-    pool: MAX
+    pool: AVE
     kernel_size: 3
-    stride: 1
+    stride: 2
   }
 }
-
-
-
-## The third Convolution Layer
 layer {
   name: "conv3"
   type: "Convolution"
@@ -144,7 +131,7 @@ layer {
   convolution_param {
     num_output: 64
     pad: 2
-    kernel_size: 2
+    kernel_size: 5
     stride: 1
     weight_filler {
       type: "gaussian"
@@ -167,19 +154,16 @@ layer {
   bottom: "conv3"
   top: "pool3"
   pooling_param {
-    pool: MAX
+    pool: AVE
     kernel_size: 3
-    stride: 1
+    stride: 2
   }
 }
-
-
-## First Fully Connected Layer
 layer {
-  name: "fc1"
+  name: "ip1"
   type: "InnerProduct"
   bottom: "pool3"
-  top: "fc1"
+  top: "ip1"
   param {
     lr_mult: 1
   }
@@ -187,7 +171,7 @@ layer {
     lr_mult: 2
   }
   inner_product_param {
-    num_output: 768
+    num_output: 64
     weight_filler {
       type: "gaussian"
       std: 0.1
@@ -197,22 +181,11 @@ layer {
     }
   }
 }
-
-
 layer {
-    name: "sig1"
-    type: "Sigmoid"
-    bottom: "fc1"
-    top: "fc1"
-}
-
-
-## Second Fully Connected Layer
-layer {
-  name: "fc2"
+  name: "ip2"
   type: "InnerProduct"
-  bottom: "fc1"
-  top: "fc2"
+  bottom: "ip1"
+  top: "ip2"
   param {
     lr_mult: 1
   }
@@ -220,7 +193,7 @@ layer {
     lr_mult: 2
   }
   inner_product_param {
-    num_output: 100
+    num_output: 10
     weight_filler {
       type: "gaussian"
       std: 0.1
@@ -230,11 +203,10 @@ layer {
     }
   }
 }
-
 layer {
   name: "accuracy"
   type: "Accuracy"
-  bottom: "fc2"
+  bottom: "ip2"
   bottom: "label"
   top: "accuracy"
   include {
@@ -244,7 +216,7 @@ layer {
 layer {
   name: "loss"
   type: "SoftmaxWithLoss"
-  bottom: "fc2"
+  bottom: "ip2"
   bottom: "label"
   top: "loss"
 }
