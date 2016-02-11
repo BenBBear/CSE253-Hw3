@@ -1,4 +1,4 @@
-net: "q3/net.simple.prototxt"
+net: "q3/old.prototxt"
 test_iter: 100
 test_interval: 1000
 type: "RMSProp"

@@ -1,4 +1,4 @@
-net: "q3/net.simple.prototxt"
+net: "q5/net.mean_gcd.prototxt"
 test_iter: 100
 test_interval: 1000
 type: "RMSProp"
@@ -9,5 +9,5 @@ lr_policy: "fixed"
 display: 200
 max_iter: 30000
 snapshot: 1000
-snapshot_prefix: "snapshots/q3/"
+snapshot_prefix: "snapshots/q5/"
 solver_mode: GPU

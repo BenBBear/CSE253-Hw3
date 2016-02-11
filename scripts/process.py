@@ -4,6 +4,7 @@ import cPickle
 import numpy as np
 import caffe
 import sys
+from collections import defaultdict
 
 TOTAL = 32*32.0
 width = 32
@@ -14,6 +15,8 @@ height = 32
 path_train = sys.argv[1]
 path_test = sys.argv[2]
 gcm = sys.argv[3]
+imageNumber = int(sys.argv[4])
+
 if gcm == 'False':
     gcm = False
 else:
@@ -24,6 +27,7 @@ ftrain = open(path_train, 'rb')
 dtest = cPickle.load(ftest)
 dtrain = cPickle.load(ftrain)
 
+Counting = defaultdict(lambda :0)
 
 def global_contrast_normalize(X, scale=1., subtract_mean=True, use_std=False, sqrt_bias=0., min_divisor=1e-8):
     X = np.reshape(X,(32,32))
@@ -61,7 +65,7 @@ def global_contrast_normalize(X, scale=1., subtract_mean=True, use_std=False, sq
     return X
 
 
-def process(dbName, dtrain, gcm=False):
+def process(dbName, dtrain, gcm=False, imageNumber=False):
     size = 4
     if gcm:
         size = 10
@@ -70,6 +74,13 @@ def process(dbName, dtrain, gcm=False):
         for i in range(len(dtrain['data'])):
             image = dtrain['data'][i]  ## 1024,1024,1024
             label = dtrain['fine_labels'][i]
+
+            if imageNumber != -1:
+                if Counting[label] >= imageNumber:
+                    continue
+                else:
+                    Counting[label] += 1
+
             datum = caffe.proto.caffe_pb2.Datum()
             datum.channels = 3
             datum.height = 32
@@ -92,8 +103,8 @@ def process(dbName, dtrain, gcm=False):
             txn.put(str_id.encode('ascii'), datum.SerializeToString())
 
 
-process('dtrain', dtrain, gcm=gcm)
-process('dtest', dtest, gcm=gcm)
+process('dtrain', dtrain, gcm=gcm, imageNumber=imageNumber)
+process('dtest', dtest, gcm=gcm, imageNumber=imageNumber)
 ftest.close()
 ftrain.close()
 ## For Mirror and Crop, they could be accomplished easily with Caffe

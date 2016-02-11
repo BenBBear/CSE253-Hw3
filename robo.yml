@@ -9,7 +9,7 @@ cifar10:
 
 q3:
   summary: The basic CNN as our foundation.
-  exec: caffe train --solver=./q3/solver.prototxt
+  exec: caffe train --solver=./q3/solver.prototxt --gpu=0
 
 
 
